@@ -1,0 +1,35 @@
+diff --git a/lib/ansible/playbook/play_context.py b/lib/ansible/playbook/play_context.py
+index 559f034..e04c4ba 100644
+--- a/lib/ansible/playbook/play_context.py
++++ b/lib/ansible/playbook/play_context.py
+@@ -81,6 +81,7 @@ MAGIC_VARIABLE_MAPPING = dict(
+    su_flags         = ('ansible_su_flags',),
+    executable       = ('ansible_shell_executable',),
+    module_compression = ('ansible_module_compression',),
++   host_key_check   = ('ansible_host_key_check',),
+ )
+ 
+ SU_PROMPT_LOCALIZATIONS = [
+@@ -198,6 +199,7 @@ class PlayContext(Base):
+     _start_at_task    = FieldAttribute(isa='string')
+     _step             = FieldAttribute(isa='bool', default=False)
+     _diff             = FieldAttribute(isa='bool', default=False)
++    _host_key_check   = FieldAttribute(isa='bool', default=True)
+ 
+     def __init__(self, play=None, options=None, passwords=None, connection_lockfd=None):
+ 
+diff --git a/lib/ansible/plugins/connection/ssh.py b/lib/ansible/plugins/connection/ssh.py
+index 3add4c1..685d171 100644
+--- a/lib/ansible/plugins/connection/ssh.py
++++ b/lib/ansible/plugins/connection/ssh.py
+@@ -158,7 +158,8 @@ class Connection(ConnectionBase):
+         # (e.g. host_key_checking) or inventory variables (ansible_ssh_port) or
+         # a combination thereof.
+ 
+-        if not C.HOST_KEY_CHECKING:
++        per_host_key_check = self._play_context.host_key_check
++        if not C.HOST_KEY_CHECKING or not per_host_key_check:
+             self._add_args(
+                 "ANSIBLE_HOST_KEY_CHECKING/host_key_checking disabled",
+                 ("-o", "StrictHostKeyChecking=no")
+                 
