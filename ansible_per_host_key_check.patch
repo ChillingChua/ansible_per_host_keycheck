@@ -19,10 +19,10 @@ index a28111c..b41a996 100644
      def __init__(self, play=None, options=None, passwords=None, connection_lockfd=None):
  
 diff --git a/lib/ansible/plugins/connection/ssh.py b/lib/ansible/plugins/connection/ssh.py
-index def3f85..0c6ab5b 100644
+index def3f85..8b6cd34 100644
 --- a/lib/ansible/plugins/connection/ssh.py
 +++ b/lib/ansible/plugins/connection/ssh.py
-@@ -163,6 +163,17 @@ class Connection(ConnectionBase):
+@@ -163,6 +163,16 @@ class Connection(ConnectionBase):
                  "ANSIBLE_HOST_KEY_CHECKING/host_key_checking disabled",
                  ("-o", "StrictHostKeyChecking=no")
              )
@@ -31,11 +31,10 @@ index def3f85..0c6ab5b 100644
 +            if not per_host_key_check:
 +                self._add_args(
 +                    "ANSIBLE_HOST_KEY_CHECKING/host_key_checking disabled",
-+                    ("-o", "StrictHostKeyChecking=no")
-+                )
-+                self._add_args(
-+                    "ANSIBLE_HOST_KEY_FILE/using /dev/null",
-+                    ("-o", "UserKnownHostFile=/dev/null")
++                    (
++                        "-o", "StrictHostKeyChecking=no",
++                        "-o", "UserKnownHostFile=/dev/null"
++                     )
 +                )
  
          if self._play_context.port is not None:
