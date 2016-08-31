@@ -1,5 +1,5 @@
 diff --git a/lib/ansible/playbook/play_context.py b/lib/ansible/playbook/play_context.py
-index 559f034..e04c4ba 100644
+index a28111c..b41a996 100644
 --- a/lib/ansible/playbook/play_context.py
 +++ b/lib/ansible/playbook/play_context.py
 @@ -81,6 +81,7 @@ MAGIC_VARIABLE_MAPPING = dict(
@@ -10,7 +10,7 @@ index 559f034..e04c4ba 100644
  )
  
  SU_PROMPT_LOCALIZATIONS = [
-@@ -198,6 +199,7 @@ class PlayContext(Base):
+@@ -199,6 +200,7 @@ class PlayContext(Base):
      _start_at_task    = FieldAttribute(isa='string')
      _step             = FieldAttribute(isa='bool', default=False)
      _diff             = FieldAttribute(isa='bool', default=False)
@@ -19,21 +19,24 @@ index 559f034..e04c4ba 100644
      def __init__(self, play=None, options=None, passwords=None, connection_lockfd=None):
  
 diff --git a/lib/ansible/plugins/connection/ssh.py b/lib/ansible/plugins/connection/ssh.py
-index 3add4c1..685d171 100644
+index def3f85..0c6ab5b 100644
 --- a/lib/ansible/plugins/connection/ssh.py
 +++ b/lib/ansible/plugins/connection/ssh.py
-@@ -158,7 +158,8 @@ class Connection(ConnectionBase):
-         # (e.g. host_key_checking) or inventory variables (ansible_ssh_port) or
-         # a combination thereof.
- 
--        if not C.HOST_KEY_CHECKING:
-+        per_host_key_check = self._play_context.host_key_check
-+        if not C.HOST_KEY_CHECKING or not per_host_key_check:
-             self._add_args(
+@@ -163,6 +163,17 @@ class Connection(ConnectionBase):
                  "ANSIBLE_HOST_KEY_CHECKING/host_key_checking disabled",
                  ("-o", "StrictHostKeyChecking=no")
-             if not per_host_key_check:
-                 self._add_args(
-                    "ANSIBLE_HOST_KEY_FILE/using /dev/null",
-                    ("-o", "UserKnownHostFile=/dev/null")
-                 )
+             )
++        else:
++            per_host_key_check = self._play_context.host_key_check
++            if not per_host_key_check:
++                self._add_args(
++                    "ANSIBLE_HOST_KEY_CHECKING/host_key_checking disabled",
++                    ("-o", "StrictHostKeyChecking=no")
++                )
++                self._add_args(
++                    "ANSIBLE_HOST_KEY_FILE/using /dev/null",
++                    ("-o", "UserKnownHostFile=/dev/null")
++                )
+ 
+         if self._play_context.port is not None:
+             self._add_args(
