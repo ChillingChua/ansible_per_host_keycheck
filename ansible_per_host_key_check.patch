@@ -32,4 +32,8 @@ index 3add4c1..685d171 100644
              self._add_args(
                  "ANSIBLE_HOST_KEY_CHECKING/host_key_checking disabled",
                  ("-o", "StrictHostKeyChecking=no")
-                 
+             if not per_host_key_check:
+                 self._add_args(
+                    "ANSIBLE_HOST_KEY_FILE/using /dev/null",
+                    ("-o", "UserKnownHostFile=/dev/null")
+                 )
